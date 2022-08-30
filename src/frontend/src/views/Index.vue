@@ -31,17 +31,12 @@
                 <label
                   v-for="(dough, index) in dough"
                   :key="dough.id"
-                  class="dough__input"
-                  :class="
-                    dough.id === 1
-                      ? 'dough__input--light'
-                      : 'dough__input--large'
-                  "
+                  :class="doughLabelClasses(dough)"
                 >
                   <input
                     type="radio"
                     name="dought"
-                    :value="dough.id === 1 ? 'light' : 'large'"
+                    :value="doughInputValue(dough)"
                     class="visually-hidden"
                     :checked="index === 0"
                   />
@@ -60,8 +55,7 @@
                 <label
                   v-for="(size, index) in sizes"
                   :key="size.id"
-                  class="diameter__input"
-                  :class="'diameter__input--' + PIZZA_SIZE_STRING[size.id]"
+                  :class="diameterInputClasses(size)"
                 >
                   <input
                     type="radio"
@@ -110,10 +104,7 @@
                       :key="ingredient.id"
                       class="ingredients__item"
                     >
-                      <span
-                        class="filling"
-                        :class="`filling--${ingredient.class}`"
-                      >
+                      <span :class="fillingCLasses(ingredient)">
                         {{ ingredient.name }}
                       </span>
 
@@ -180,6 +171,7 @@
 import misc from "@/static/misc.json";
 import pizza from "@/static/pizza.json";
 import user from "@/static/user.json";
+import { getIngredientImgName } from "@/common/helpers.js";
 
 const PIZZA_SIZE_STRING = {
   1: "small",
@@ -205,6 +197,27 @@ export default {
       PIZZA_SIZE_STRING,
       PIZZA_SAUCE_STRING,
     };
+  },
+  computed: {},
+  methods: {
+    fillingCLasses(ingredient) {
+      return ["filling", `filling--${getIngredientImgName(ingredient)}`];
+    },
+    doughLabelClasses(dough) {
+      return [
+        "dough__input",
+        `dough__input--${dough.id === 1 ? "light" : "large"}`,
+      ];
+    },
+    doughInputValue(dough) {
+      return dough.id === 1 ? "light" : "large";
+    },
+    diameterInputClasses(size) {
+      return [
+        "diameter__input",
+        `diameter__input--${PIZZA_SIZE_STRING[size.id]}`,
+      ];
+    },
   },
 };
 </script>
