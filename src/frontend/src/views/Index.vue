@@ -1,140 +1,17 @@
 <template>
   <div>
-    <header class="header">
-      <div class="header__logo">
-        <a href="index.html" class="logo">
-          <img
-            src="@/assets/img/logo.svg"
-            alt="V!U!E! Pizza logo"
-            width="90"
-            height="40"
-          />
-        </a>
-      </div>
-      <div class="header__cart">
-        <a href="cart.html">0 ₽</a>
-      </div>
-      <div class="header__user">
-        <a href="#" class="header__login"><span>Войти</span></a>
-      </div>
-    </header>
-
     <main class="content">
       <form action="#" method="post">
         <div class="content__wrapper">
           <h1 class="title title--big">Конструктор пиццы</h1>
-          <div class="content__dough">
-            <div class="sheet">
-              <h2 class="title title--small sheet__title">Выберите тесто</h2>
+          <BuilderDoughSelector :doughs="doughs" />
 
-              <div class="sheet__content dough">
-                <label
-                  v-for="(dough, index) in dough"
-                  :key="dough.id"
-                  :class="doughLabelClasses(dough)"
-                >
-                  <input
-                    type="radio"
-                    name="dought"
-                    :value="doughInputValue(dough)"
-                    class="visually-hidden"
-                    :checked="index === 0"
-                  />
-                  <b>{{ dough.name }}</b>
-                  <span>{{ dough.description }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
+          <BuilderSizeSelector :sizes="sizes" />
 
-          <div class="content__diameter">
-            <div class="sheet">
-              <h2 class="title title--small sheet__title">Выберите размер</h2>
-
-              <div class="sheet__content diameter">
-                <label
-                  v-for="(size, index) in sizes"
-                  :key="size.id"
-                  :class="diameterInputClasses(size)"
-                >
-                  <input
-                    type="radio"
-                    name="diameter"
-                    :value="PIZZA_SIZE_STRING[size.id]"
-                    class="visually-hidden"
-                    :checked="index === 0"
-                  />
-                  <span>{{ size.name }}</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <div class="content__ingredients">
-            <div class="sheet">
-              <h2 class="title title--small sheet__title">
-                Выберите ингредиенты
-              </h2>
-
-              <div class="sheet__content ingredients">
-                <div class="ingredients__sauce">
-                  <p>Основной соус:</p>
-
-                  <label
-                    v-for="(sauce, index) in sauces"
-                    :key="sauce.id"
-                    class="radio ingredients__input"
-                  >
-                    <input
-                      type="radio"
-                      name="sauce"
-                      :value="PIZZA_SAUCE_STRING[sauce.id]"
-                      :checked="index === 0"
-                    />
-                    <span>{{ sauce.name }}</span>
-                  </label>
-                </div>
-
-                <div class="ingredients__filling">
-                  <p>Начинка:</p>
-
-                  <ul class="ingredients__list">
-                    <li
-                      v-for="ingredient in ingredients"
-                      :key="ingredient.id"
-                      class="ingredients__item"
-                    >
-                      <span :class="fillingCLasses(ingredient)">
-                        {{ ingredient.name }}
-                      </span>
-
-                      <div class="counter counter--orange ingredients__counter">
-                        <button
-                          type="button"
-                          class="counter__button counter__button--minus"
-                          disabled
-                        >
-                          <span class="visually-hidden">Меньше</span>
-                        </button>
-                        <input
-                          type="text"
-                          name="counter"
-                          class="counter__input"
-                          value="0"
-                        />
-                        <button
-                          type="button"
-                          class="counter__button counter__button--plus"
-                        >
-                          <span class="visually-hidden">Больше</span>
-                        </button>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BuilderIngredientsSelector
+            :sauces="sauces"
+            :ingredients="ingredients"
+          />
 
           <div class="content__pizza">
             <label class="input">
@@ -147,17 +24,11 @@
             </label>
 
             <div class="content__constructor">
-              <div class="pizza pizza--foundation--big-tomato">
-                <div class="pizza__wrapper">
-                  <div class="pizza__filling pizza__filling--ananas"></div>
-                  <div class="pizza__filling pizza__filling--bacon"></div>
-                  <div class="pizza__filling pizza__filling--cheddar"></div>
-                </div>
-              </div>
+              <BuilderPizzaView />
             </div>
 
             <div class="content__result">
-              <p>Итого: 0 ₽</p>
+              <BuilderPriceCounter />
               <button type="button" class="button" disabled>Готовьте!</button>
             </div>
           </div>
@@ -171,21 +42,22 @@
 import misc from "@/static/misc.json";
 import pizza from "@/static/pizza.json";
 import user from "@/static/user.json";
-import { getIngredientImgName } from "@/common/helpers.js";
 
-const PIZZA_SIZE_STRING = {
-  1: "small",
-  2: "normal",
-  3: "big",
-};
-
-const PIZZA_SAUCE_STRING = {
-  1: "tomato",
-  2: "creamy",
-};
+import BuilderDoughSelector from "../modules/builder/BuilderDoughSelector.vue";
+import BuilderSizeSelector from "../modules/builder/BuilderSizeSelector.vue";
+import BuilderIngredientsSelector from "../modules/builder/BuilderIngredientsSelector.vue";
+import BuilderPizzaView from "../modules/builder/BuilderPizzaView.vue";
+import BuilderPriceCounter from "../modules/builder/BuilderPriceCounter.vue";
 
 export default {
   name: "IndexPage",
+  components: {
+    BuilderPriceCounter,
+    BuilderPizzaView,
+    BuilderIngredientsSelector,
+    BuilderSizeSelector,
+    BuilderDoughSelector,
+  },
   data() {
     return {
       user,
@@ -194,30 +66,7 @@ export default {
       sizes: pizza.sizes,
       doughs: pizza.dough,
       misc,
-      PIZZA_SIZE_STRING,
-      PIZZA_SAUCE_STRING,
     };
-  },
-  computed: {},
-  methods: {
-    fillingCLasses(ingredient) {
-      return ["filling", `filling--${getIngredientImgName(ingredient)}`];
-    },
-    doughLabelClasses(dough) {
-      return [
-        "dough__input",
-        `dough__input--${dough.id === 1 ? "light" : "large"}`,
-      ];
-    },
-    doughInputValue(dough) {
-      return dough.id === 1 ? "light" : "large";
-    },
-    diameterInputClasses(size) {
-      return [
-        "diameter__input",
-        `diameter__input--${PIZZA_SIZE_STRING[size.id]}`,
-      ];
-    },
   },
 };
 </script>
